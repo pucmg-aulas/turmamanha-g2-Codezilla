@@ -12,7 +12,7 @@ O uso do estacionamento envolve a seleção de uma vaga livre e a ocupação des
 * Pedro Afonso Machado Vasconselos
 * Pedro Oliveira Lanza
 * Thiago Costa Soares
-* Vinicius de Oliveira Ramos
+* Vinicius Oliveira Ramos
 
 ## Professor responsável 
 
