@@ -1,17 +1,17 @@
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 // Classe Cliente
 class Cliente {
     private String id;
     private String nome;
     private List<Veiculo> listaDeVeiculos;
-    private TipoCliente tipoCliente;
 
-    public Cliente(String id, String nome, TipoCliente tipoCliente) {
+    public Cliente(String id, String nome) {
         this.id = id;
         this.nome = nome;
-        this.tipoCliente = tipoCliente;
         this.listaDeVeiculos = new ArrayList<>();
     }
 
@@ -19,33 +19,44 @@ class Cliente {
         listaDeVeiculos.add(veiculo);
     }
 
-    public TipoCliente getTipoCliente() {
-        return tipoCliente;
+    public List<Veiculo> getListaDeVeiculos() {
+        return listaDeVeiculos;
     }
-}
 
-// Enum TipoCliente
-enum TipoCliente {
-    REGULAR, IDOSO, PCD, VIP
+    public String getNome() {
+        return nome;
+    }
 }
 
 // Classe Veiculo
 class Veiculo {
     private String placa;
+    private String modelo;
 
-    public Veiculo(String placa) {
+    public Veiculo(String placa, String modelo) {
         this.placa = placa;
+        this.modelo = modelo;
     }
 
     public String getPlaca() {
         return placa;
     }
+
+    public String getModelo() {
+        return modelo;
+    }
+}
+
+// Enum para Tipo de Vaga
+enum TipoVaga {
+    REGULAR, VIP, IDOSO, PCD
 }
 
 // Classe Vaga
 class Vaga {
     private String identificador;
     private TipoVaga tipoVaga;
+    private Veiculo veiculo;
     private boolean ocupada = false;
 
     public Vaga(String identificador, TipoVaga tipoVaga) {
@@ -57,12 +68,14 @@ class Vaga {
         return ocupada;
     }
 
-    public void ocupar() {
-        ocupada = true;
+    public void bloquearVaga(Veiculo veiculo) {
+        this.veiculo = veiculo;
+        this.ocupada = true;
     }
 
-    public void liberar() {
-        ocupada = false;
+    public void desocuparVaga() {
+        this.veiculo = null;
+        this.ocupada = false;
     }
 
     public TipoVaga getTipoVaga() {
@@ -72,114 +85,147 @@ class Vaga {
     public String getIdentificador() {
         return identificador;
     }
-}
 
-// Enum TipoVaga
-enum TipoVaga {
-    REGULAR, VIP
+    public Veiculo getVeiculo() {
+        return veiculo;
+    }
 }
 
 // Classe Cobrança
 class Cobranca {
-    private static final double PRECO_FRAÇÃO = 4.0; // R$4 a cada 15 minutos
-    private static final double LIMITE_COBRANÇA = 50.0;
+    private double descontoVaga;
+    private LocalDateTime tempoEntrada;
+    private LocalDateTime tempoSaida;
+    private int valorLimite = 50;
 
-    public static double calcularCobranca(long minutos, Cliente cliente, Vaga vaga) {
-        double valorBase = (minutos / 15) * PRECO_FRAÇÃO;
+    public Cobranca(LocalDateTime tempoEntrada) {
+        this.tempoEntrada = tempoEntrada;
+    }
 
-        // Aplica o limite de R$50
-        if (valorBase > LIMITE_COBRANÇA) {
-            valorBase = LIMITE_COBRANÇA;
+    public void registrarSaida(LocalDateTime tempoSaida) {
+        this.tempoSaida = tempoSaida;
+    }
+
+    public double calcularCobrancaPorTempo(Cliente cliente, Vaga vaga) {
+        long minutos = java.time.Duration.between(tempoEntrada, tempoSaida).toMinutes();
+        double valorBase = (minutos / 15) * 4.0; // R$4 por 15 minutos
+
+        // Aplicar limite de R$50
+        if (valorBase > valorLimite) {
+            valorBase = valorLimite;
         }
 
-        // Calcula o desconto com base no tipo de cliente
-        double desconto = 0.0;
-        if (cliente.getTipoCliente() == TipoCliente.IDOSO) {
-            desconto = 0.15; // 15% desconto
-        } else if (cliente.getTipoCliente() == TipoCliente.PCD) {
-            desconto = 0.13; // 13% desconto
-        }
+        // Aplicar desconto com base no tipo de vaga
+        descontoVaga = calcularDesconto(vaga.getTipoVaga());
+        return valorBase * (1 - descontoVaga);
+    }
 
-        // Ajuste para vaga VIP
-        if (vaga.getTipoVaga() == TipoVaga.VIP) {
-            valorBase *= 1.2; // Vaga VIP é 20% mais cara
+    public double calcularDesconto(TipoVaga tipoVaga) {
+        switch (tipoVaga) {
+            case IDOSO:
+                return 0.15;
+            case PCD:
+                return 0.13;
+            case VIP:
+                return -0.2; // VIP é 20% mais caro
+            default:
+                return 0.0;
         }
-
-        // Aplicação do desconto (se houver)
-        return valorBase * (1 - desconto);
     }
 }
 
-// Classe ParqueDeEstacionamento
+// Classe Parque de Estacionamento
 class ParqueDeEstacionamento {
-    private List<Vaga> vagas = new ArrayList<>();
+    private String nome;
+    private String local;
+    private int NdeVagas;
+    private int VagasBloqueadas = 0;
+    private List<Vaga> vagas;
 
-    public ParqueDeEstacionamento(int numeroDeVagas, int numeroDeVagasVIP) {
-        for (int i = 1; i <= numeroDeVagas; i++) {
-            TipoVaga tipo = i <= numeroDeVagasVIP ? TipoVaga.VIP : TipoVaga.REGULAR;
-            vagas.add(new Vaga("V" + i, tipo));
+    public ParqueDeEstacionamento(String nome, String local, int NdeVagas) {
+        this.nome = nome;
+        this.local = local;
+        this.NdeVagas = NdeVagas;
+        this.vagas = new ArrayList<>();
+        for (int i = 1; i <= NdeVagas; i++) {
+            // Adiciona vagas regulares por padrão
+            vagas.add(new Vaga("V" + i, TipoVaga.REGULAR));
         }
     }
 
-    public Vaga registrarEntradaVeiculo(Veiculo veiculo) {
+    public boolean encontrarVagasLivres() {
         for (Vaga vaga : vagas) {
             if (!vaga.isOcupada()) {
-                vaga.ocupar();
-                System.out.println("Veículo " + veiculo.getPlaca() + " estacionado na vaga " + vaga.getIdentificador());
-                return vaga;
+                return true;
             }
         }
-        System.out.println("Estacionamento cheio!");
-        return null;
+        return false;
     }
 
-    public void registrarSaidaVeiculo(Veiculo veiculo, Vaga vaga, long minutos, Cliente cliente) {
-        if (vaga != null && vaga.isOcupada()) {
-            double valor = Cobranca.calcularCobranca(minutos, cliente, vaga);
-            System.out.println("Veículo " + veiculo.getPlaca() + " deixou a vaga " + vaga.getIdentificador() +
-                    ". Valor da cobrança: R$" + valor);
-            vaga.liberar();
-        } else {
-            System.out.println("Vaga não está ocupada!");
+    public Optional<Vaga> vagaDesocupada() {
+        for (Vaga vaga : vagas) {
+            if (!vaga.isOcupada()) {
+                return Optional.of(vaga);
+            }
         }
+        return Optional.empty();
+    }
+
+    public void registrarEntradaVeiculo(Veiculo veiculo, TipoVaga tipoVaga) {
+        Optional<Vaga> vagaLivre = vagaDesocupada();
+
+        if (vagaLivre.isPresent()) {
+            Vaga vaga = vagaLivre.get();
+            vaga.bloquearVaga(veiculo);
+            System.out.println("Veículo " + veiculo.getPlaca() + " estacionado na vaga " + vaga.getIdentificador());
+        } else {
+            System.out.println("Estacionamento cheio.");
+        }
+    }
+
+    public void registrarSaidaVeiculo(Veiculo veiculo, Cliente cliente, LocalDateTime tempoEntrada) {
+        for (Vaga vaga : vagas) {
+            if (vaga.getVeiculo() != null && vaga.getVeiculo().equals(veiculo)) {
+                Cobrança cobranca = new Cobrança(tempoEntrada);
+                cobranca.registrarSaida(LocalDateTime.now());
+                double valor = cobranca.calcularCobrancaPorTempo(cliente, vaga);
+                System.out.println("Veículo " + veiculo.getPlaca() + " deixou a vaga " + vaga.getIdentificador() +
+                        ". Valor da cobrança: R$" + valor);
+                vaga.desocuparVaga();
+                break;
+            }
+        }
+    }
+
+    public void SearchVeiculo(Veiculo veiculo) {
+        for (Vaga vaga : vagas) {
+            if (vaga.getVeiculo() != null && vaga.getVeiculo().equals(veiculo)) {
+                System.out.println("Veículo " + veiculo.getPlaca() + " está estacionado na vaga " + vaga.getIdentificador());
+                return;
+            }
+        }
+        System.out.println("Veículo " + veiculo.getPlaca() + " não encontrado.");
     }
 }
 
-// Main
+// Classe principal com exemplo de uso
 public class Main {
     public static void main(String[] args) {
-        // Criação de clientes
-        Cliente clienteRegular = new Cliente("1", "João", TipoCliente.REGULAR);
-        Cliente clienteIdoso = new Cliente("2", "Maria", TipoCliente.IDOSO);
-        Cliente clientePCD = new Cliente("3", "José", TipoCliente.PCD);
-        Cliente clienteVIP = new Cliente("4", "Ana", TipoCliente.VIP);
+        // Criação de um cliente e veículos
+        Cliente cliente = new Cliente("1", "João");
+        Veiculo veiculo1 = new Veiculo("ABC-1234", "Sedan");
+        cliente.cadastrarVeiculo(veiculo1);
 
-        // Criação de veículos
-        Veiculo carroJoao = new Veiculo("ABC-1234");
-        Veiculo carroMaria = new Veiculo("XYZ-5678");
-        Veiculo carroJose = new Veiculo("DEF-9012");
-        Veiculo carroAna = new Veiculo("GHI-3456");
+        // Criação do estacionamento com 5 vagas
+        ParqueDeEstacionamento estacionamento = new ParqueDeEstacionamento("Xulambs", "Centro", 5);
 
-        // Cadastro dos veículos aos clientes
-        clienteRegular.cadastrarVeiculo(carroJoao);
-        clienteIdoso.cadastrarVeiculo(carroMaria);
-        clientePCD.cadastrarVeiculo(carroJose);
-        clienteVIP.cadastrarVeiculo(carroAna);
+        // Entrada de veículo
+        estacionamento.registrarEntradaVeiculo(veiculo1, TipoVaga.REGULAR);
 
-        // Criação do estacionamento (com 5 vagas, 2 delas VIP)
-        ParqueDeEstacionamento estacionamento = new ParqueDeEstacionamento(5, 2);
+        // Simula o tempo de estacionamento
+        LocalDateTime tempoEntrada = LocalDateTime.now().minusMinutes(60); // 60 minutos
 
-        // Simulação de entrada e saída de veículos
-        Vaga vagaJoao = estacionamento.registrarEntradaVeiculo(carroJoao);
-        estacionamento.registrarSaidaVeiculo(carroJoao, vagaJoao, 60, clienteRegular); // 60 minutos
-
-        Vaga vagaMaria = estacionamento.registrarEntradaVeiculo(carroMaria);
-        estacionamento.registrarSaidaVeiculo(carroMaria, vagaMaria, 45, clienteIdoso); // 45 minutos
-
-        Vaga vagaJose = estacionamento.registrarEntradaVeiculo(carroJose);
-        estacionamento.registrarSaidaVeiculo(carroJose, vagaJose, 30, clientePCD); // 30 minutos
-
-        Vaga vagaAna = estacionamento.registrarEntradaVeiculo(carroAna);
-        estacionamento.registrarSaidaVeiculo(carroAna, vagaAna, 75, clienteVIP); // 75 minutos
+        // Saída do veículo
+        estacionamento.registrarSaidaVeiculo(veiculo1, cliente, tempoEntrada);
     }
 }
