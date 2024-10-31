@@ -1,31 +1,42 @@
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalTime;
+import java.time.Duration;
 
 public class Cliente {
-    private String id;
     private String nome;
     private String cpf;
+    private LocalTime horarioEntrada;
+    private LocalTime horarioSaida;
     private TipoCliente tipoCliente;
-    private List<Veiculo> listaDeVeiculos;
+    private String placa;
+    private String modelo;
 
-    public Cliente(String id, String nome, String cpf, TipoCliente tipoCliente) {
-        this.id = id;
+    // Construtor para definir o nome, CPF, tipo de cliente, placa e modelo do carro
+    public Cliente(String nome, String cpf, TipoCliente tipoCliente, String placa, String modelo) {
         this.nome = nome;
         this.cpf = cpf;
         this.tipoCliente = tipoCliente;
-        this.listaDeVeiculos = new ArrayList<>();
+        this.placa = placa;
+        this.modelo = modelo;
     }
 
-    public Cliente() {
-
+    public void setHorarioEntrada(LocalTime entrada) {
+        this.horarioEntrada = entrada;
     }
 
-    public void cadastrarVeiculo(Veiculo veiculo) {
-        listaDeVeiculos.add(veiculo);
+    public void setHorarioSaida(LocalTime saida) {
+        this.horarioSaida = saida;
     }
 
-    public List<Veiculo> getListaDeVeiculos() {
-        return listaDeVeiculos;
+    public TipoCliente getTipoCliente() {
+        return tipoCliente;
+    }
+
+    public String getPlaca() {
+        return placa;
+    }
+
+    public String getModelo() {
+        return modelo;
     }
 
     public String getNome() {
@@ -36,7 +47,12 @@ public class Cliente {
         return cpf;
     }
 
-    public TipoCliente getTipoCliente() {
-        return tipoCliente;
+    // Calcula o tempo total estacionado em minutos
+    public long calcularTempoEstacionado() {
+        if (horarioEntrada != null && horarioSaida != null) {
+            return Duration.between(horarioEntrada, horarioSaida).toMinutes();
+        } else {
+            throw new IllegalStateException("Horário de entrada ou saída não definidos.");
+        }
     }
 }
