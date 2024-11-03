@@ -1,16 +1,16 @@
+import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.Duration;
 
 public class Cliente {
     private String nome;
     private String cpf;
-    private LocalTime horarioEntrada;
-    private LocalTime horarioSaida;
     private TipoCliente tipoCliente;
     private String placa;
     private String modelo;
+    private LocalDateTime horarioEntrada;
+    private LocalDateTime horarioSaida;
+    private String vagaOcupada; // Identificação da vaga ocupada pelo cliente
 
-    // Construtor para definir o nome, CPF, tipo de cliente, placa e modelo do carro
     public Cliente(String nome, String cpf, TipoCliente tipoCliente, String placa, String modelo) {
         this.nome = nome;
         this.cpf = cpf;
@@ -19,12 +19,13 @@ public class Cliente {
         this.modelo = modelo;
     }
 
-    public void setHorarioEntrada(LocalTime entrada) {
-        this.horarioEntrada = entrada;
+    // Getters e Setters
+    public String getNome() {
+        return nome;
     }
 
-    public void setHorarioSaida(LocalTime saida) {
-        this.horarioSaida = saida;
+    public String getCpf() {
+        return cpf;
     }
 
     public TipoCliente getTipoCliente() {
@@ -39,20 +40,37 @@ public class Cliente {
         return modelo;
     }
 
-    public String getNome() {
-        return nome;
+    public LocalDateTime getHorarioEntrada() {
+        return horarioEntrada;
     }
 
-    public String getCpf() {
-        return cpf;
+    public LocalDateTime getHorarioSaida() {
+        return horarioSaida;
     }
 
-    // Calcula o tempo total estacionado em minutos
+    public String getVagaOcupada() {
+        return vagaOcupada;
+    }
+
+    public void setVagaOcupada(String vagaOcupada) {
+        this.vagaOcupada = vagaOcupada;
+    }
+
+    // Define o horário de entrada do cliente
+    public void setHorarioEntrada(LocalTime horarioEntrada) {
+        this.horarioEntrada = LocalDateTime.of(LocalDateTime.now().toLocalDate(), horarioEntrada);
+    }
+
+    // Define o horário de saída do cliente
+    public void setHorarioSaida(LocalTime horarioSaida) {
+        this.horarioSaida = LocalDateTime.of(LocalDateTime.now().toLocalDate(), horarioSaida);
+    }
+
+    // Calcula o tempo estacionado em minutos
     public long calcularTempoEstacionado() {
         if (horarioEntrada != null && horarioSaida != null) {
-            return Duration.between(horarioEntrada, horarioSaida).toMinutes();
-        } else {
-            throw new IllegalStateException("Horário de entrada ou saída não definidos.");
+            return java.time.Duration.between(horarioEntrada, horarioSaida).toMinutes();
         }
+        return 0;
     }
 }
