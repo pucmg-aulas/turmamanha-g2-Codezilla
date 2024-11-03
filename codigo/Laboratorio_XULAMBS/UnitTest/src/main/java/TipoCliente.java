@@ -1,3 +1,6 @@
 public enum TipoCliente {
-    REGULAR, VIP, IDOSO, PCD
+    REGULAR,
+    VIP,
+    PCD,
+    IDOSO
 }
