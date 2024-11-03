@@ -1,37 +1,27 @@
 public class Vaga {
-    private String identificador;
-    private TipoVaga tipoVaga;
-    private Veiculo veiculo;
-    private boolean ocupada = false;
+    private String identificacao;
+    private String tipo;
+    private boolean disponivel;
 
-    public Vaga(String identificador, TipoVaga tipoVaga) {
-        this.identificador = identificador;
-        this.tipoVaga = tipoVaga;
+    public Vaga(String identificacao, String tipo) {
+        this.identificacao = identificacao;
+        this.tipo = tipo;
+        this.disponivel = true; // Vaga começa como disponível
     }
 
-    public boolean isOcupada() {
-        return ocupada;
+    public String getIdentificacao() {
+        return identificacao;
     }
 
-    public void bloquearVaga(Veiculo veiculo) {
-        this.veiculo = veiculo;
-        this.ocupada = true;
+    public String getTipo() {
+        return tipo;
     }
 
-    public void desocuparVaga() {
-        this.veiculo = null;
-        this.ocupada = false;
+    public boolean isDisponivel() {
+        return disponivel;
     }
 
-    public TipoVaga getTipoVaga() {
-        return tipoVaga;
-    }
-
-    public String getIdentificador() {
-        return identificador;
-    }
-
-    public Veiculo getVeiculo() {
-        return veiculo;
+    public void setDisponivel(boolean disponivel) {
+        this.disponivel = disponivel;
     }
 }
