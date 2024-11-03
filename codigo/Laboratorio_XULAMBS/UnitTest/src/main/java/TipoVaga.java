@@ -1,3 +1,6 @@
 public enum TipoVaga {
-    REGULAR, VIP, IDOSO, PCD
+    REGULAR,
+    IDOSO,
+    PCD,
+    VIP
 }
