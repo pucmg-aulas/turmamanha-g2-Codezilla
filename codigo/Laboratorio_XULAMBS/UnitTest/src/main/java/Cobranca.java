@@ -1,43 +1,41 @@
-import java.time.LocalDateTime;
-
 public class Cobranca {
-    private double descontoVaga;
-    private LocalDateTime tempoEntrada;
-    private LocalDateTime tempoSaida;
-    private int valorLimite = 50;
+    private static final double TAXA_FRACAO = 4.00; // R$4 por cada 15 minutos
+    private static final int TEMPO_FRACAO = 15; // Fração de 15 minutos
+    private static final double VALOR_MAXIMO = 50.00; // Valor máximo de R$50
 
-    public Cobranca(LocalDateTime tempoEntrada) {
-        this.tempoEntrada = tempoEntrada;
+    private static final double DESCONTO_IDOSOS = 0.15; // 15% de desconto para idosos
+    private static final double DESCONTO_PCD = 0.13; // 13% de desconto para PCD
+    private static final double AUMENTO_VIP = 0.20; // 20% a mais para clientes VIP
+
+    // Construtor padrão
+    public Cobranca() {
     }
 
-    public void registrarSaida(LocalDateTime tempoSaida) {
-        this.tempoSaida = tempoSaida;
-    }
+    public double calcularValor(long tempoEstacionado, Cliente cliente) {
+        // Calcula o número de frações de 15 minutos
+        long numeroDeFracoes = (tempoEstacionado + TEMPO_FRACAO - 1) / TEMPO_FRACAO;
 
-    public double calcularCobrancaPorTempo(Cliente cliente, Vaga vaga) {
-        long minutos = java.time.Duration.between(tempoEntrada, tempoSaida).toMinutes();
-        double valorBase = (minutos / 15.0) * 4.0; // 4 reais por 15 minutos
+        // Calcula o valor base antes de aplicar descontos ou acréscimos
+        double valorBase = numeroDeFracoes * TAXA_FRACAO;
 
-        // Aplicar limite de 50 reais
-        if (valorBase > valorLimite) {
-            valorBase = valorLimite;
-        }
-
-        // Aplicar desconto com base no tipo de vaga
-        descontoVaga = calcularDesconto(vaga.getTipoVaga());
-        return valorBase * (1 - descontoVaga);
-    }
-
-    public double calcularDesconto(TipoVaga tipoVaga) {
-        switch (tipoVaga) {
+        // Ajuste de taxa baseado no tipo de cliente
+        switch (cliente.getTipoCliente()) {
             case IDOSO:
-                return 0.15;
+                valorBase *= (1 - DESCONTO_IDOSOS);
+                break;
             case PCD:
-                return 0.13;
+                valorBase *= (1 - DESCONTO_PCD);
+                break;
             case VIP:
-                return -0.2; // VIP e 20% mais caro
+                valorBase *= (1 + AUMENTO_VIP);
+                break;
+            case REGULAR:
             default:
-                return 0.0;
+                // taxa regular sem alterações
+                break;
         }
+
+        // Aplica o limite máximo de R$50
+        return Math.min(valorBase, VALOR_MAXIMO);
     }
 }
