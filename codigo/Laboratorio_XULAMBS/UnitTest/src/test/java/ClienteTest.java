@@ -1,31 +1,43 @@
 import org.junit.jupiter.api.Test;
+import java.time.LocalTime;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ClienteTest {
 
-        /* testCadastrarVeiculo
-    Descrição: Este teste verifica se a funcionalidade de cadastrar um veículo em um cliente está funcionando corretamente.
-    Um cliente é criado e um veículo é cadastrado. O teste então verifica se a lista de veículos do cliente contém o veículo
-    cadastrado e se seu tamanho é 1.
-
-    testGetNome
-    Descrição: Este teste verifica se o metodo getNome retorna corretamente o nome do cliente. Um cliente é criado e o
-    teste compara o nome retornado com o valor esperado.
-    */
-
     @Test
-    void testCadastrarVeiculo() {
-        Cliente cliente = new Cliente("1", "Carlos", "12345678900", TipoCliente.REGULAR);
-        Veiculo veiculo = new Veiculo("ABC-1234", "Fusca");
-        cliente.cadastrarVeiculo(veiculo);
+    void testSetHorarioEntrada() {
+        // Cria um cliente com nome, CPF, tipo de cliente, placa e modelo
+        Cliente cliente = new Cliente("João", "123456789", TipoCliente.REGULAR, "ABC1234", "Sedan");
+        
+        // Define o horário de entrada do cliente às 9:00
+        LocalTime entrada = LocalTime.of(9, 0);
+        cliente.setHorarioEntrada(entrada);
 
-        assertEquals(1, cliente.getListaDeVeiculos().size());
-        assertEquals(veiculo, cliente.getListaDeVeiculos().get(0));
+        // Verifica se o horário de entrada foi definido corretamente
+        // Verifica se o horário de entrada não é nulo
+        assertNotNull(cliente.getHorarioEntrada(), "Horário de entrada não deve ser nulo");
+        
+        // Verifica se o horário de entrada corresponde ao horário definido (9:00)
+        assertEquals(entrada, cliente.getHorarioEntrada().toLocalTime(), "Horário de entrada deve ser igual ao definido");
     }
 
     @Test
-    void testGetNome() {
-        Cliente cliente = new Cliente("1", "Carlos", "12345678900", TipoCliente.REGULAR);
-        assertEquals("Carlos", cliente.getNome());
+    void testCalcularTempoEstacionado() {
+        // Cria um cliente com nome, CPF, tipo de cliente, placa e modelo
+        Cliente cliente = new Cliente("Maria", "987654321", TipoCliente.VIP, "XYZ5678", "SUV");
+        
+        // Define o horário de entrada do cliente às 10:00
+        LocalTime entrada = LocalTime.of(10, 0);
+        cliente.setHorarioEntrada(entrada);
+
+        // Define o horário de saída do cliente às 12:00
+        LocalTime saida = LocalTime.of(12, 0);
+        cliente.setHorarioSaida(saida);
+
+        // Calcula o tempo estacionado em minutos (esperado 120 minutos)
+        long tempoEstacionado = cliente.calcularTempoEstacionado();
+
+        // Verifica se o tempo estacionado é igual a 120 minutos
+        assertEquals(120, tempoEstacionado, "Tempo estacionado deve ser 120 minutos");
     }
 }
