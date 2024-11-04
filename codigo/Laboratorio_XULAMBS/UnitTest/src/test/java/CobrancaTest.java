@@ -4,19 +4,24 @@ import org.junit.jupiter.api.Test;
 public class CobrancaTest {
 
     @Test
-    public void testCalcularValor() {
+    public void testCalcularValorClienteRegular() {
         Cobranca cobranca = new Cobranca();
-        
-        // Teste para Cliente Regular
         Cliente clienteRegular = new Cliente("Cliente1", TipoCliente.REGULAR);
-        double valorCobradoRegular = cobranca.calcularValor(30, clienteRegular); // 30 minutos (2 frações de 15 minutos)
-        // Espera-se: 2 frações * R$4 = R$8
-        assertEquals(8.0, valorCobradoRegular, 0.01, "Cobrança incorreta para cliente regular");
 
-        // Teste para Cliente Idoso
+        double valorCobrado = cobranca.calcularValor(30, clienteRegular); // 30 minutos (2 frações de 15 minutos)
+
+        // Espera-se: 2 frações * R$4 = R$8
+        assertEquals(8.0, valorCobrado, 0.01);
+    }
+
+    @Test
+    public void testCalcularValorClienteIdoso() {
+        Cobranca cobranca = new Cobranca();
         Cliente clienteIdoso = new Cliente("Cliente2", TipoCliente.IDOSO);
-        double valorCobradoIdoso = cobranca.calcularValor(30, clienteIdoso); // 30 minutos (2 frações de 15 minutos)
+
+        double valorCobrado = cobranca.calcularValor(30, clienteIdoso); // 30 minutos (2 frações de 15 minutos)
+
         // Espera-se: 2 frações * R$4 = R$8 - 15% de desconto = R$6.80
-        assertEquals(6.80, valorCobradoIdoso, 0.01, "Cobrança incorreta para cliente idoso");
+        assertEquals(6.80, valorCobrado, 0.01);
     }
 }
