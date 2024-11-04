@@ -1,11 +1,24 @@
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Scanner;
 
 public class Main {
     private static int contadorAnonimos = 1; // Contador para clientes anônimos
 
+    // Método para salvar informações no arquivo
+    public static void salvarEmArquivo(String nomeArquivo, String conteudo) {
+        try (FileWriter writer = new FileWriter(nomeArquivo, true)) { // 'true' permite que o conteúdo seja adicionado no final do arquivo
+            writer.write(conteudo + System.lineSeparator()); // Escreve o conteúdo e adiciona uma nova linha
+            System.out.println("Informações salvas com sucesso no arquivo: " + nomeArquivo);
+        } catch (IOException e) {
+            System.out.println("Erro ao salvar informações no arquivo: " + e.getMessage());
+        }
+    }
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
+        String nomeArquivo = System.getProperty("user.home") + "/Desktop/informacoes_estacionamento.txt"; // Caminho para a área de trabalho
 
         // Inicializa o parque de estacionamento com as vagas predefinidas
         ParqueDeEstacionamento estacionamento = new ParqueDeEstacionamento();
@@ -95,6 +108,15 @@ public class Main {
                 System.out.printf("Tempo Estacionado: %d minutos%n", tempoEstacionado);
                 System.out.printf("Vaga Utilizada: %s (%s)%n", vaga.getIdentificacao(), tipoCliente);
                 System.out.printf("Valor a Pagar: R$ %.2f%n", valor);
+
+                // Armazena as informações em arquivo .txt
+                String conteudo = String.format(
+                        "Nome do Cliente: %s%nCPF do Cliente: %s%nTipo de Cliente: %s%nPlaca do Veículo: %s%nModelo do Veículo: %s%n" +
+                                "Tempo Estacionado: %d minutos%nVaga Utilizada: %s (%s)%nValor a Pagar: R$ %.2f%n---",
+                        cliente.getNome(), cliente.getCpf(), cliente.getTipoCliente(), cliente.getPlaca(), cliente.getModelo(),
+                        tempoEstacionado, vaga.getIdentificacao(), tipoCliente, valor
+                );
+                salvarEmArquivo(nomeArquivo, conteudo);
 
             } catch (IllegalStateException ex) {
                 System.out.println("Erro: " + ex.getMessage());
