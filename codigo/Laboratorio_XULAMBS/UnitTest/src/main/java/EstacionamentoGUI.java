@@ -2,6 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,7 +38,7 @@ public class EstacionamentoGUI extends JFrame {
         add(titleLabel, BorderLayout.NORTH);
 
         JPanel inputPanel = new JPanel();
-        inputPanel.setLayout(new GridLayout(15, 2, 5, 5)); // Ajustado para 15 linhas para acomodar o novo botão
+        inputPanel.setLayout(new GridLayout(15, 2, 5, 5));
         inputPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         anonimoCheckBox = new JCheckBox("Permanecer Anônimo");
@@ -97,7 +99,6 @@ public class EstacionamentoGUI extends JFrame {
         valorMedioButton.setForeground(Color.WHITE);
         inputPanel.add(valorMedioButton);
 
-        // Novo botão para consultar o ranking dos clientes
         JButton rankingButton = new JButton("Consultar Ranking de Arrecadação");
         rankingButton.setBackground(new Color(128, 0, 0));
         rankingButton.setForeground(Color.WHITE);
@@ -226,7 +227,7 @@ public class EstacionamentoGUI extends JFrame {
 
         Cliente cliente = new Cliente(nome, cpf, TipoCliente.valueOf(tipoCliente), placa, modelo);
         cliente.setHorarioEntrada(java.time.LocalTime.now());
-        cliente.setVagaOcupada(vagaSelecionada); // Atribui a vaga ocupada ao cliente
+        cliente.setVagaOcupada(vagaSelecionada);
 
         try {
             Vaga vaga = estacionamento.getVagaPorIdentificacao(vagaSelecionada);
@@ -287,6 +288,25 @@ public class EstacionamentoGUI extends JFrame {
 
         vaga.setDisponivel(true);
         clientes.remove(cliente);
+
+        // Salva as informações no arquivo .txt
+        String conteudo = String.format(
+                "Nome do Cliente: %s%nCPF do Cliente: %s%nPlaca do Veículo: %s%nTempo Estacionado: %d minutos%nValor a Pagar: R$ %.2f%n---",
+                cliente.getNome(), cliente.getCpf(), cliente.getPlaca(), cliente.calcularTempoEstacionado(), valor
+        );
+        salvarEmArquivo(conteudo);
+    }
+
+    private void salvarEmArquivo(String conteudo) {
+        String nomeArquivo = System.getProperty("user.home") + "/Documents/informacoes_estacionamento.txt";
+        System.out.println("Tentando salvar em: " + nomeArquivo); // Exibe o caminho para confirmar
+
+        try (FileWriter writer = new FileWriter(nomeArquivo, true)) {
+            writer.write(conteudo + System.lineSeparator());
+            JOptionPane.showMessageDialog(this, "Informações salvas com sucesso na área de trabalho!");
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Erro ao salvar informações: " + e.getMessage());
+        }
     }
 
     private void abrirJanelaConsultaHistorico() {
