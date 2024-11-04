@@ -1,36 +1,32 @@
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-class VagaTest {
-
-    /* testBloquearVaga
-    Descrição: Este teste verifica se uma vaga pode ser bloqueada (ocupada) corretamente por um veículo. Uma vaga é
-    criada e um veículo é registrado nela. O teste confirma que a vaga está ocupada e que o veículo associado à vaga é o
-    esperado.
-
-    testDesocuparVaga
-    Descrição: Este teste verifica se uma vaga pode ser desocupada corretamente. Após bloquear a vaga com um veículo, a
-    vaga é desocupada e o teste verifica se a vaga não está mais ocupada e se o veículo associado à vaga é null.
-    */
+public class VagaTest {
 
     @Test
-    void testBloquearVaga() {
-        Vaga vaga = new Vaga("V1", TipoVaga.REGULAR);
-        Veiculo veiculo = new Veiculo("ABC-1234", "Fusca");
-
-        vaga.bloquearVaga(veiculo);
-        assertTrue(vaga.isOcupada());
-        assertEquals(veiculo, vaga.getVeiculo());
+    public void testVagaInicializacao() {
+        Vaga vaga = new Vaga("A01", "VIP");
+        
+        // Verifica se a identificação e o tipo estão corretos
+        assertEquals("A01", vaga.getIdentificacao(), "Identificação incorreta");
+        assertEquals("VIP", vaga.getTipo(), "Tipo de vaga incorreto");
+        
+        // Verifica se a vaga está disponível ao ser criada
+        assertTrue(vaga.isDisponivel(), "A vaga deveria estar disponível ao ser criada");
     }
 
     @Test
-    void testDesocuparVaga() {
-        Vaga vaga = new Vaga("V1", TipoVaga.REGULAR);
-        Veiculo veiculo = new Veiculo("ABC-1234", "Fusca");
-
-        vaga.bloquearVaga(veiculo);
-        vaga.desocuparVaga();
-        assertFalse(vaga.isOcupada());
-        assertNull(vaga.getVeiculo());
+    public void testAlterarDisponibilidadeVaga() {
+        Vaga vaga = new Vaga("B02", "Regular");
+        
+        // Define a vaga como indisponível e verifica
+        vaga.setDisponivel(false);
+        assertFalse(vaga.isDisponivel(), "A vaga deveria estar indisponível após a alteração");
+        
+        // Define a vaga como disponível e verifica
+        vaga.setDisponivel(true);
+        assertTrue(vaga.isDisponivel(), "A vaga deveria estar disponível após a alteração");
     }
 }
