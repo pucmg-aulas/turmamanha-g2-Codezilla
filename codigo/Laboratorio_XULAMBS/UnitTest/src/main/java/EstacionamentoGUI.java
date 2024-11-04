@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -289,7 +290,6 @@ public class EstacionamentoGUI extends JFrame {
         vaga.setDisponivel(true);
         clientes.remove(cliente);
 
-        // Salva as informações no arquivo .txt
         String conteudo = String.format(
                 "Nome do Cliente: %s%nCPF do Cliente: %s%nPlaca do Veículo: %s%nTempo Estacionado: %d minutos%nValor a Pagar: R$ %.2f%n---",
                 cliente.getNome(), cliente.getCpf(), cliente.getPlaca(), cliente.calcularTempoEstacionado(), valor
@@ -298,16 +298,18 @@ public class EstacionamentoGUI extends JFrame {
     }
 
     private void salvarEmArquivo(String conteudo) {
-        String nomeArquivo = System.getProperty("user.home") + "/Documents/informacoes_estacionamento.txt";
+        String nomeArquivo = "C:/Users/vinic/OneDrive/Documentos/informacoes_estacionamento.txt";
         System.out.println("Tentando salvar em: " + nomeArquivo); // Exibe o caminho para confirmar
 
         try (FileWriter writer = new FileWriter(nomeArquivo, true)) {
             writer.write(conteudo + System.lineSeparator());
-            JOptionPane.showMessageDialog(this, "Informações salvas com sucesso na área de trabalho!");
+            JOptionPane.showMessageDialog(this, "Informações salvas com sucesso na pasta Documentos!");
         } catch (IOException e) {
             JOptionPane.showMessageDialog(this, "Erro ao salvar informações: " + e.getMessage());
         }
     }
+
+
 
     private void abrirJanelaConsultaHistorico() {
         String cpf = JOptionPane.showInputDialog(this, "Digite o CPF para consulta do histórico:");
