@@ -1,0 +1,31 @@
+import org.example.controller.CadastrarClienteController;
+import org.example.exceptions.IdentificadorExistenteException;
+import org.example.model.Cliente;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class CadastrarClienteControllerTest {
+    private CadastrarClienteController controller;
+
+    @BeforeEach
+    void setUp() {
+        controller = new CadastrarClienteController();
+    }
+
+    @Test
+    void testCadastrarClienteComIdentificadorExistente() {
+        assertThrows(IdentificadorExistenteException.class, () -> {
+            controller.cadastrarCliente("João", "123", "ABC1234");
+            controller.cadastrarCliente("Maria", "123", "XYZ5678");
+        });
+    }
+
+    @Test
+    void testCadastrarClienteComDadosInvalidos() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            controller.cadastrarCliente("", "", "");
+        });
+    }
+}
