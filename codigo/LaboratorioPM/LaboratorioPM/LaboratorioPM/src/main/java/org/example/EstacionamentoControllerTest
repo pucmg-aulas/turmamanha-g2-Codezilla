@@ -1,0 +1,43 @@
+import org.example.controller.EstacionamentoController;
+import org.example.exceptions.PlacaExistenteException;
+import org.example.model.Cliente;
+import org.example.model.Vaga;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.sql.SQLException;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+class EstacionamentoControllerTest {
+    private EstacionamentoController controller;
+
+    @BeforeEach
+    void setUp() {
+        controller = new EstacionamentoController();
+    }
+
+    @Test
+    void testOcuparVagaComSucesso() throws PlacaExistenteException {
+        Cliente cliente = new Cliente(1, "João", "123");
+        Vaga vaga = controller.ocuparVaga(0, 0, cliente, "ABC1230");
+        assertNotNull(vaga);
+        assertTrue(vaga.isOcupada());
+    }
+
+    @Test
+    void testOcuparVagaComPlacaExistente() {
+        Cliente cliente = new Cliente(1, "João", "123");
+        assertThrows(PlacaExistenteException.class, () -> {
+            controller.ocuparVaga(0, 0, cliente, "ABC1234");
+            controller.ocuparVaga(0, 1, cliente, "ABC1234");
+        });
+    }
+
+    @Test
+    void testLiberarVagaComSucesso() {
+        controller.liberarVaga(0, 0);
+        Vaga vaga = controller.getEstacionamentos().get(0).getVagas().get(0);
+        assertFalse(vaga.isOcupada());
+    }
+}
